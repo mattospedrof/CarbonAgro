@@ -1,7 +1,25 @@
-# CarbonAgro — Informações
+![Badge em Desenvolvimento](https://img.shields.io/badge/Status-Em_Desenvolvimento-darkblue)
 
+## CarbonAgro — Informações
 
-## 1. Introdução e Objetivo
+Este é um projeto open-source com o objetivo de incluir várias áreas do conhecimento. Sinta-se à vontade para colaborar de qualquer forma que seja!
+
+Segue abaixo a tela inicial do aplicativo.
+![Interface do Carbon Agro](image.png)
+
+## Introdução
+<div align="justify">
+
+O CarbonAgro é um produto tecnológico orientado às Ciências Ambientais que integra sensoriamento remoto, modelagem ecológica, geoprocessamento e ciência de dados para estimar, monitorar e comunicar o sequestro de carbono em sistemas agrícolas, pecuários e agroflorestais no Brasil. Seu propósito é fornecer uma plataforma aberta, auditável e cientificamente robusta que auxilie pesquisadores, técnicos e produtores rurais na quantificação de biomassa, carbono e emissões evitadas, promovendo maior transparência em iniciativas de MRV — Monitoring, Reporting and Verification (Monitoramento, Relato e Verificação).
+
+O aplicativo fundamenta-se no uso de índices espectrais, especialmente o NDVI — Normalized Difference Vegetation Index (Índice de Vegetação por Diferença Normalizada), derivado das bandas Red e NIR — Near-Infrared (Infravermelho Próximo) de sensores orbitais como Sentinel-2 e Landsat 8/9. Esses índices são amplamente utilizados na literatura para estimar vigor da vegetação, produtividade primária, padrões fenológicos e tendências de degradação. A partir desses dados, o sistema permite derivar estimativas de biomassa, carbono (tC — toneladas de Carbono) e equivalência de dióxido de carbono (tCO₂e — toneladas de dióxido de carbono equivalente), utilizando fatores padrão e equações alométricas.
+
+O projeto dialoga diretamente com temas centrais das Ciências Ambientais, incluindo mudanças climáticas, conservação do solo, serviços ecossistêmicos, dinâmica do uso da terra (LULUCF — Land Use, Land-Use Change and Forestry), agricultura sustentável, monitoramento de pastagens e modelagem de estoques de carbono. A quantificação do sequestro de carbono é um dos principais elementos de políticas públicas de mitigação climática e de iniciativas privadas como créditos de carbono, ABC+, REDD+ e Pagamentos por Serviços Ambientais (PSA). Dessa forma, o CarbonAgro contribui para reduzir incertezas, padronizar metodologias e democratizar o acesso a ferramentas científicas avançadas.
+
+Em um contexto global no qual a agricultura brasileira desempenha papel crítico tanto nas emissões quanto no potencial de remoção de CO₂, um sistema aberto e colaborativo torna-se essencial para garantir integridade ambiental, rastreabilidade metodológica e capacidade de auditoria independente. O CarbonAgro promove a interconexão entre tecnologia, ciência ambiental e sustentabilidade, fornecendo uma base replicável e expansível para mensurar variações de biomassa ao longo do tempo, simular cenários de manejo, apoiar políticas de baixa emissão de carbono e contribuir para um uso mais eficiente e responsável do território.
+</div>
+
+## 1. Objetivo
 O CarbonAgro foi concebido para fornecer estimativas replicáveis e transparentes de estoques e fluxos de carbono em áreas agropecuárias e agroflorestais. O objetivo aqui é documentar, em nível de artigo científico, a metodologia empregada para cálculo de NDVI, conversão para biomassa/estoque de carbono, protocolo de validação e estimativa de incertezas.
 
 Este documento dá suporte para:
@@ -11,25 +29,20 @@ Este documento dá suporte para:
 
 ---
 
-## 2. Proposta do App (visão científica)
-O CarbonAgro oferece:
+## 2. Proposta do App
+Oferecer:
 - Pipeline reproduzível para gerar índices vegetacionais (NDVI, EVI) a partir de bandas multispectrais (Sentinel-2, Landsat).
 - Ferramentas de inventário local (coleta de DAP, altura, espécie) para alimentar equações alométricas.
 - Módulos para projeção de cenários de manejo e produção de relatórios com incertezas.
 
-**Princípios científicos**:
-- Transparência: todas as fórmulas e parâmetros regionais devem ser documentados no repositório.
-- Reprodutibilidade: scripts e dockerfiles para reproduzir os cálculos.
-- Calibração local: a plataforma enfatiza calibração com amostras de campo.
 
----
 
-## 3. Metodologia (detalhada)
+## 3. Metodologia que pode ser utilizada
 
 ### 3.1 Aquisição de imagens remotas
 - Preferência: Sentinel-2 (10m) para NDVI, Landsat 8/9 (30m) como série temporal histórica.
 - Janela temporal: selecionar imagens na estação desejada (ex.: período seco / chuvoso), e idealmente usar composição de mediana para reduzir ruído de nuvens.
-- Correções recomendadas: correção atmosférica (Sen2Cor para Sentinel-2) e máscara de nuvens (QA60 ou Fmask). Em escala de pesquisa, sempre documente o método de correção.
+- Correções recomendadas: correção atmosférica (Sen2Cor para Sentinel-2) e máscara de nuvens (QA60 ou Fmask).
 
 ### 3.2 Pré-processamento
 1. Reprojetar imagens para uma projeção comum (ex.: EPSG:4326 para visualização, EPSG:32723/24 para áreas Brasil centro-oeste conforme UTM).
@@ -42,7 +55,7 @@ O CarbonAgro oferece:
 - EVI = 2.5 * (NIR - Red) / (NIR + 6*Red - 7.5*Blue + 1)  (opcional)
 - Calcule médias, desvio e métricas por parcela/polígono.
 
-### 3.4 Estimativa de biomassa e carbono (quando possível)
+### 3.4 Estimativa de biomassa e carbono
 - Para árvores: usar equações alométricas regionais (por espécie ou gênero). Fórmula geral:
   - B = a × DAP^b × H^c
   - Onde B = biomassa arbórea (kg ou t), DAP = diâmetro à altura do peito (cm), H = altura (m).
@@ -111,7 +124,7 @@ Use Monte Carlo para propagar incertezas nos parâmetros:
 
 ---
 
-## 9. Implementação prática (rodar localmente)
+## 9. Comandos para rodar em localhost
 ### Dependências de sistema (Linux/Windows)
 - GDAL / PROJ (via instalador ou wheels)
 - Python 3.8+
