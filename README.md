@@ -1,3 +1,5 @@
+Projeto desenvolvido para a disciplina de Perspectivas das Ciências Ambientais.
+
 ![Badge em Desenvolvimento](https://img.shields.io/badge/Status-Em_Desenvolvimento-darkblue)
 
 ## CarbonAgro — Informações
