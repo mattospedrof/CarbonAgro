@@ -111,7 +111,7 @@ Use Monte Carlo para propagar incertezas nos parâmetros:
 
 ---
 
-## 7. Sugestôes do autor para apresentação
+## 7. Sugestões para apresentação
 - **Figura de mapa**: use a imagem PNG gerada com colorbar; legenda: “NDVI (Sentinel-2), composição mediana, janela [dd/mm/yyyy — dd/mm/yyyy]. Média NDVI = X (σ = Y).”
 - **Tabela**: resumo de estoques por estrato (tC/ha, tCO₂e/ha), N parc., intervalo de confiança 95%.
 - **Metodologia**: documentar correções atmosféricas, QA (máscara de nuvens), versão de dados (Sentinel-2 L2A), equações alométricas com referências.
