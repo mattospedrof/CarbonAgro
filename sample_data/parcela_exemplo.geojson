@@ -1,0 +1,38 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Exemplo Parcela"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -47.8825,
+              -15.7942
+            ],
+            [
+              -47.882,
+              -15.7942
+            ],
+            [
+              -47.882,
+              -15.7946
+            ],
+            [
+              -47.8825,
+              -15.7946
+            ],
+            [
+              -47.8825,
+              -15.7942
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

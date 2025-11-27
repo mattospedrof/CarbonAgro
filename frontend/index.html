@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>CarbonAgro — NDVI processor (artigo-ready)</title>
+
+  <style>
+    :root{
+      --bg:#0f1114; --card:#121216; --accent:#3fb14f; --muted:#9aa3a6; --panel:#16171a;
+      --danger:#ff6b6b; --glass: rgba(255,255,255,0.03);
+    }
+    html,body{height:100%; margin:0; font-family: "Segoe UI", Roboto, Arial, sans-serif; background:linear-gradient(180deg,#070809 0%, #0b0c0e 100%); color:#e7eef0;}
+    .wrap{max-width:1100px; margin:28px auto; padding:26px;}
+    header{display:flex; align-items:center; gap:18px}
+    header h1{margin:0; font-size:1.55rem; color:var(--accent)}
+    .card{background:var(--card); border-radius:12px; padding:20px; box-shadow:0 6px 24px rgba(0,0,0,0.6); margin-top:18px}
+    label{display:block; font-weight:600; color:#cfead1; margin-top:14px}
+    input[type=file]{display:block; margin-top:8px; background:var(--glass); padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.03); width:100%}
+    .row{display:flex; gap:18px; flex-wrap:wrap}
+    button.primary{background:var(--accent); color:#021202; border:none; padding:12px 18px; border-radius:10px; font-weight:700; cursor:pointer; margin-top:16px}
+    button.ghost{background:transparent; color:var(--muted); border:1px solid rgba(255,255,255,0.03); padding:10px 14px; border-radius:8px; cursor:pointer; margin-top:16px}
+    .meta{font-size:0.9rem; color:var(--muted); margin-top:8px}
+    .status{margin-top:12px; font-weight:700}
+    .preview{display:flex; gap:18px; margin-top:18px; align-items:flex-start}
+    .preview img{max-width:480px; border-radius:8px; border:1px solid rgba(255,255,255,0.04)}
+    .statbox{background:var(--panel); padding:12px; border-radius:8px; min-width:220px}
+    footer{margin-top:26px; font-size:0.9rem; color:var(--muted)}
+    a.link{color:var(--accent); text-decoration:none}
+    pre{background:#060607; padding:10px; border-radius:8px; overflow:auto}
+    @media(max-width:900px){ .preview{flex-direction:column; align-items:center} }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>CarbonAgro — Processador NDVI</h1>
+      <div style="margin-left:auto;text-align:right">
+        <div style="font-size:0.95rem;color:var(--muted)">Open-source</div>
+        <div style="font-size:0.82rem;color:var(--muted)">Local demo • backend em <code>http://localhost:8000</code></div>
+      </div>
+    </header>
+
+    <div class="card">
+      <h2 style="margin:0 0 6px 0">Gerar NDVI — GeoTIFF & PNG</h2>
+      <div class="meta">Envie duas bandas georreferenciadas (Red + NIR). O servidor retorna: (a) GeoTIFF NDVI para download e (b) PNG colorizado pronto para figura em artigo científico.</div>
+
+      <form id="form" class="form">
+        <label for="red">Red band (GeoTIFF)</label>
+        <input id="red" name="red" type="file" accept=".tif,.tiff" required>
+
+        <label for="nir">NIR band (GeoTIFF)</label>
+        <input id="nir" name="nir" type="file" accept=".tif,.tiff" required>
+
+        <div class="row">
+          <button id="btnProcess" class="primary" type="button">Processar e Gerar NDVI</button>
+          <button id="btnDownloadGeo" class="ghost" type="button" disabled>Baixar GeoTIFF (NDVI)</button>
+        </div>
+
+        <div id="status" class="status" style="color:var(--muted)"></div>
+      </form>
+
+      <div class="preview">
+        <div style="flex:1">
+          <h3 style="margin:0 0 8px 0">Preview PNG</h3>
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <img id="imgPreview" src="" alt="NDVI preview" style="display:none">
+            <div class="statbox" id="stats" style="display:none">
+              <div><strong>Estatísticas (NDVI)</strong></div>
+              <div id="mean">Média: —</div>
+              <div id="std">Desvio: —</div>
+              <div id="min">Min: —</div>
+              <div id="max">Max: —</div>
+              <div style="margin-top:8px; font-size:0.85rem; color:var(--muted)">Use este PNG em figuras; o servidor adiciona colorbar e escala [-1,1].</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="width:280px">
+          <h3 style="margin-top:0">Instruções rápidas</h3>
+          <ol style="color:var(--muted);font-size:0.95rem">
+            <li>Suba os arquivos red/nir GeoTIFF (mesma resolução & dimensão).</li>
+            <li>Clique em <em>Processar</em>. Aguarde o backend gerar os artefatos.</li>
+            <li>Baixe o GeoTIFF para análise GIS ou use o PNG para figuras.</li>
+          </ol>
+          <div style="margin-top:8px" class="meta">Exemplo em <code>sample_data/red_sample.tif</code> e <code>sample_data/nir_sample.tif</code></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h3 style="margin:0 0 8px 0">Procedimentos para artigo (sugestão)</h3>
+      <p style="color:var(--muted)">Para figuras em artigos: baixe o PNG (ou gere o TIFF e processe com QGIS), inclua legenda com métricas (média, std) e explique a janela temporal das imagens e as correções aplicadas (correção atmosférica, máscara de nuvens, projeção).</p>
+      <pre>
+Equações principais:
+NDVI = (NIR - Red) / (NIR + Red)
+Biomassa ≈ a × DAP^b × H^c  (equações alométricas regionais)
+Conversão: tC = Biomassa × 0.47 ; tCO₂e = tC × 44/12
+      </pre>
+    </div>
+
+    <footer>
+      <div>Projeto CarbonAgro — open-source — para contribuições: <a class="link" href="#">repositorio (propor)</a></div>
+    </footer>
+  </div>
+
+  <script>
+    const btn = document.getElementById('btnProcess');
+    const btnDownloadGeo = document.getElementById('btnDownloadGeo');
+    const status = document.getElementById('status');
+    const img = document.getElementById('imgPreview');
+    const statsBox = document.getElementById('stats');
+    const meanEl = document.getElementById('mean');
+    const stdEl = document.getElementById('std');
+    const minEl = document.getElementById('min');
+    const maxEl = document.getElementById('max');
+    let lastGeoUrl = null;
+
+    function reset() {
+      status.textContent = '';
+      img.style.display = 'none';
+      statsBox.style.display = 'none';
+      btnDownloadGeo.disabled = true;
+      if (lastGeoUrl) {
+        URL.revokeObjectURL(lastGeoUrl);
+        lastGeoUrl = null;
+      }
+    }
+
+    async function postFile(endpoint) {
+      const redF = document.getElementById('red').files[0];
+      const nirF = document.getElementById('nir').files[0];
+      if(!redF || !nirF) { status.textContent = 'Escolha as duas bandas (Red e NIR).'; return null; }
+      const fd = new FormData();
+      fd.append('red', redF);
+      fd.append('nir', nirF);
+      try {
+        const resp = await fetch(endpoint, { method: 'POST', body: fd });
+        return resp;
+      } catch (err) {
+        throw err;
+      }
+    }
+
+    btn.addEventListener('click', async () => {
+      reset();
+      status.textContent = 'Processando PNG...';
+      try {
+        // 1) Request PNG preview
+        const respPng = await postFile('http://localhost:8000/compute-ndvi-png');
+        if(!respPng.ok) {
+          const txt = await respPng.text();
+          status.textContent = 'Erro (PNG): ' + respPng.status + ' - ' + txt;
+          return;
+        }
+        const blobPng = await respPng.blob();
+        const urlPng = URL.createObjectURL(blobPng);
+        img.src = urlPng;
+        img.style.display = 'block';
+
+        // Extract NDVI stats from headers if present
+        const mean = respPng.headers.get('x-ndvi-mean');
+        const std = respPng.headers.get('x-ndvi-std');
+        const minv = respPng.headers.get('x-ndvi-min');
+        const maxv = respPng.headers.get('x-ndvi-max');
+        if(mean !== null) {
+          meanEl.textContent = 'Média: ' + parseFloat(mean).toFixed(3);
+          stdEl.textContent = 'Desvio: ' + parseFloat(std).toFixed(3);
+          minEl.textContent = 'Min: ' + parseFloat(minv).toFixed(3);
+          maxEl.textContent = 'Max: ' + parseFloat(maxv).toFixed(3);
+          statsBox.style.display = 'block';
+        }
+
+        status.textContent = 'PNG pronto. Gerando GeoTIFF para download...';
+
+        // 2) Request GeoTIFF (separado) and enable download button
+        const respTif = await postFile('http://localhost:8000/compute-ndvi');
+        if(!respTif.ok) {
+          const txt = await respTif.text();
+          status.textContent = 'Erro (GeoTIFF): ' + respTif.status + ' - ' + txt;
+          return;
+        }
+        const blobTif = await respTif.blob();
+        const urlTif = URL.createObjectURL(blobTif);
+        lastGeoUrl = urlTif;
+        btnDownloadGeo.onclick = () => {
+          const a = document.createElement('a');
+          a.href = urlTif;
+          a.download = 'ndvi.tif';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+        };
+        btnDownloadGeo.disabled = false;
+
+        status.textContent = 'Pronto — PNG exibido e GeoTIFF disponível para download.';
+      } catch (err) {
+        status.textContent = 'Erro no processamento: ' + (err.message || err);
+      }
+    });
+  </script>
+</body>
+</html>

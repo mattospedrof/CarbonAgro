@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+rasterio
+geopandas
+shapely
+fiona
+pandas
+python-multipart
+numpy
+matplotlib
+Pillow

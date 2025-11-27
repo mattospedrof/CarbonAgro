@@ -1,0 +1,11 @@
+
+__pycache__/
+*.pyc
+.env
+venv/
+node_modules/
+dist/
+.DS_Store
+*.sqlite3
+carbonagro_package_v2.zip
+carbonagro_package.zip
